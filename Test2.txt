@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" id="htmlTag">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Password Strength Checker</title>
+
+  <!-- Tailwind CDN with darkMode: 'class' support -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+    }
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white text-gray-900 transition duration-300 dark:bg-gray-900 dark:text-white">
+  <div class="min-h-screen flex items-center justify-center px-4">
+    <div class="w-full max-w-sm bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md space-y-6">
+      <div class="flex justify-between items-center">
+        <h2 class="text-2xl font-bold">Password<br><span class="text-gray-500 dark:text-gray-300">Strength Checker</span></h2>
+        <button onclick="toggleTheme()" class="text-xl">🌙</button>
+      </div>
+
+      <!-- Password Checker -->
+      <div>
+        <label class="text-sm font-semibold text-gray-700 dark:text-gray-300">Password</label>
+        <input type="password" id="passwordInput" oninput="checkStrength()"
+          class="w-full mt-1 px-4 py-2 rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white outline-none"
+          placeholder="Enter password">
+        <div class="h-2 rounded bg-gray-300 dark:bg-gray-600 mt-2 overflow-hidden">
+          <div id="strengthBar" class="h-full bg-red-500 w-0 transition-all duration-300"></div>
+        </div>
+        <p class="text-sm text-gray-600 dark:text-gray-300 mt-1" id="strengthText">Weak</p>
+      </div>
+
+      <hr class="border-gray-300 dark:border-gray-700" />
+
+      <!-- Password Generator -->
+      <div>
+        <h3 class="font-semibold text-gray-800 dark:text-white mb-2">Generate Password</h3>
+        <div class="space-y-2 text-gray-800 dark:text-white">
+          <label class="flex items-center space-x-2">
+            <input type="checkbox" id="lengthCheck" checked class="accent-blue-500">
+            <span>Length</span>
+            <input type="number" id="lengthInput" value="12" min="6" max="32"
+              class="ml-auto w-16 text-center rounded bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white px-2 py-1 outline-none">
+          </label>
+          <label class="flex items-center space-x-2"><input type="checkbox" id="uppercase" checked class="accent-blue-500"> <span>Uppercase</span></label>
+          <label class="flex items-center space-x-2"><input type="checkbox" id="numbers" checked class="accent-blue-500"> <span>Numbers</span></label>
+          <label class="flex items-center space-x-2"><input type="checkbox" id="symbols" checked class="accent-blue-500"> <span>Symbols</span></label>
+        </div>
+        <button onclick="generatePassword()" class="w-full mt-4 bg-gray-900 dark:bg-gray-600 text-white py-2 rounded-xl font-semibold">Generate Password</button>
+        <input type="text" id="generatedPassword" readonly
+          class="mt-2 w-full bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 rounded-xl outline-none">
+        <button onclick="copyPassword()" class="mt-2 w-full text-sm text-blue-600 dark:text-blue-400 hover:underline">Copy to Clipboard</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script Section -->
+  <script>
+    function toggleTheme() {
+      document.documentElement.classList.toggle('dark');
+    }
+
+    function checkStrength() {
+      const pass = document.getElementById('passwordInput').value;
+      const bar = document.getElementById('strengthBar');
+      const text = document.getElementById('strengthText');
+      let strength = 0;
+
+      if (pass.length >= 8) strength++;
+      if (/[A-Z]/.test(pass)) strength++;
+      if (/[0-9]/.test(pass)) strength++;
+      if (/[^A-Za-z0-9]/.test(pass)) strength++;
+
+      let widths = ['w-1/4', 'w-1/2', 'w-3/4', 'w-full'];
+      let colors = ['bg-red-500', 'bg-yellow-400', 'bg-blue-500', 'bg-green-500'];
+      let labels = ['Weak', 'Moderate', 'Good', 'Strong'];
+
+      bar.className = `h-full ${colors[strength - 1] || 'bg-red-500'} ${widths[strength - 1] || 'w-1/4'} transition-all duration-300`;
+      text.textContent = labels[strength - 1] || 'Weak';
+    }
+
+    function generatePassword() {
+      const length = document.getElementById('lengthInput').value;
+      const upper = document.getElementById('uppercase').checked;
+      const number = document.getElementById('numbers').checked;
+      const symbol = document.getElementById('symbols').checked;
+
+      let chars = 'abcdefghijklmnopqrstuvwxyz';
+      if (upper) chars += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      if (number) chars += '0123456789';
+      if (symbol) chars += '!@#$%^&*()_+[]{}<>?';
+
+      let password = '';
+      for (let i = 0; i < length; i++) {
+        password += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+
+      document.getElementById('generatedPassword').value = password;
+      document.getElementById('passwordInput').value = password;
+      checkStrength();
+    }
+
+    function copyPassword() {
+      const input = document.getElementById('generatedPassword');
+      input.select();
+      document.execCommand('copy');
+      alert('Password copied to clipboard!');
+    }
+  </script>
+</body>
+</html>
